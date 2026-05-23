@@ -1,6 +1,6 @@
 module mini-avito
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/jmoiron/sqlx v1.4.0
@@ -8,3 +8,5 @@ require (
 )
 
 require github.com/joho/godotenv v1.5.1
+
+require golang.org/x/crypto v0.52.0
