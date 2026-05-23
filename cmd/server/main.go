@@ -20,8 +20,9 @@ import (
 
 func main() {
 	cfg := config.New()
+	//fmt.Printf("DEBUG CONFIG: Host='%s', Port='%d'\n", cfg.DBHost, cfg.DBPort)
 
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
 
 	db, err := sqlx.Connect("postgres", dsn)
