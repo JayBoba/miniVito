@@ -4,15 +4,17 @@ import (
 	"context"
 
 	"mini-avito/internal/models"
+
+	"github.com/google/uuid"
 )
 
 type UserRepository interface {
-	CreateUser(ctx context.Context, login, passwordHash string) (string, error)
+	CreateUser(ctx context.Context, login, passwordHash string) (uuid.UUID, error)
 	GetUserByLogin(ctx context.Context, login string) (models.User, error)
 	CreateSession(ctx context.Context, session models.Session) error
 }
 
 type UserUseCase interface {
-	Register(ctx context.Context, login, password string) (string, error)
+	Register(ctx context.Context, login, password string) (uuid.UUID, error)
 	Login(ctx context.Context, login, password string) (string, error)
 }
