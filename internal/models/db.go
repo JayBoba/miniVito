@@ -3,16 +3,19 @@ package models
 import "time"
 
 type User struct {
-	ID           int       `db:"id"`
-	Login        string    `db:"login"`
-	PasswordHash string    `db:"password_hash"`
-	CreatedAt    time.Time `db:"created_at"`
+	ID        string    `db:"id"`
+	Login     string    `db:"login"`
+	Password  string    `db:"password"`
+	Email     *string   `db:"email"`
+	Phone     *string   `db:"phone"`
+	IsActive  bool      `db:"is_active"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type Session struct {
-	ID           int       `db:"id"`
-	UserID       int       `db:"user_id"`
-	RefreshToken string    `db:"refresh_token"`
-	ExpiresAt    time.Time `db:"expires_at"`
-	CreatedAt    time.Time `db:"created_at"`
+	SessionID string    `db:"session_id"`
+	UserID    string    `db:"user_id"`
+	CreatedAt time.Time `db:"created_at"`
+	ExpiresAt time.Time `db:"expires_at"`
 }

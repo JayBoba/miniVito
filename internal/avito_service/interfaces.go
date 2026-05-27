@@ -7,12 +7,12 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(ctx context.Context, login, passwordHash string) (int, error)
+	CreateUser(ctx context.Context, login, passwordHash string) (string, error)
 	GetUserByLogin(ctx context.Context, login string) (models.User, error)
 	CreateSession(ctx context.Context, session models.Session) error
 }
 
 type UserUseCase interface {
-	Register(ctx context.Context, login, password string) (int, error)
+	Register(ctx context.Context, login, password string) (string, error)
 	Login(ctx context.Context, login, password string) (string, error)
 }
