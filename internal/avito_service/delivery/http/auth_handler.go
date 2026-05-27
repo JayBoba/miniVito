@@ -14,7 +14,7 @@ type AuthHandler struct {
 	usecase avito_service.UserUseCase
 }
 
-func NewAuthHandlers(uc avito_service.UserUseCase) *AuthHandler {
+func NewAuthHandler(uc avito_service.UserUseCase) *AuthHandler {
 	return &AuthHandler{
 		usecase: uc,
 	}

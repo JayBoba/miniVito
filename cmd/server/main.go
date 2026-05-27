@@ -15,6 +15,7 @@ import (
 
 	httpdelivery "mini-avito/internal/avito_service/delivery/http"
 	"mini-avito/internal/avito_service/repository"
+	"mini-avito/internal/avito_service/usecase"
 	"mini-avito/internal/config"
 )
 
@@ -31,11 +32,15 @@ func main() {
 	}
 	defer db.Close()
 
-	repo := repository.NewPostgresRepository(db)
-	handler := httpdelivery.NewHandler(repo)
+	userRepo := repository.NewUserRepo(db)
+	userUC := usecase.NewUserUseCase(userRepo)
+	authHandler := httpdelivery.NewAuthHandler(userUC)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/dbtest", handler.DBTest)
+	testRepo := repository.NewPostgresRepository(db)
+	testHandler := httpdelivery.NewHandler(testRepo)
+	mux.HandleFunc("/dbtest", testHandler.DBTest)
+	mux.HandleFunc("/register", authHandler.Register)
 
 	srv := &http.Server{
 		Addr:    ":8080",
