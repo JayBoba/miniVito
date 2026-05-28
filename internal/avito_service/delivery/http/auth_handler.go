@@ -2,9 +2,11 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"mini-avito/internal/avito_service"
 	"net/http"
 	"regexp"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/google/uuid"
@@ -61,15 +63,51 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := h.usecase.Register(r.Context(), req.Login, req.Password)
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value") || strings.Contains(err.Error(), "users_login_key") {
+			http.Error(w, "User with this login already exists", http.StatusConflict)
+			return
+		}
+
+		log.Printf("DEBUG Register error: %v\n", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	
+
 	json.NewEncoder(w).Encode(registerResponse{
 		UserID: userID,
 	})
 
+}
+
+type loginResponse struct {
+	Token string `json:"token"`
+}
+
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req registerRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Bad request: invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.usecase.Login(r.Context(), req.Login, req.Password)
+	if err != nil {
+		http.Error(w, "Invalid login or password", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK) // 200 OK
+
+	json.NewEncoder(w).Encode(loginResponse{
+		Token: token,
+	})
 }

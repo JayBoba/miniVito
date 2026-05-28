@@ -59,7 +59,7 @@ func (r *userRepo) CreateSession(ctx context.Context, session models.Session) er
 		VALUES ($1, $2, $3)
 	`
 
-	_, err := r.db.ExecContext(ctx, query, session.ID, session.UserID, session.ExpiresAt)
+	_, err := r.db.ExecContext(ctx, query, session.SessionID, session.UserID, session.ExpiresAt)
 	if err != nil {
 		return err
 	}

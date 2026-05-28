@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -41,11 +42,13 @@ func (u *userUseCase) Register(ctx context.Context, login, password string) (uui
 func (u *userUseCase) Login(ctx context.Context, login, password string) (string, error) {
 	user, err := u.repo.GetUserByLogin(ctx, login)
 	if err != nil {
+		log.Printf("DEBUG GetUserByLogin error: %v\n", err)
 		return "", fmt.Errorf("invalid login or password")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
+		log.Printf("DEBUG Bcrypt error: %v\n", err)
 		return "", fmt.Errorf("invalid login or password")
 	}
 
@@ -55,7 +58,7 @@ func (u *userUseCase) Login(ctx context.Context, login, password string) (string
 	}
 
 	session := models.Session{
-		ID:        uuid.New(),
+		SessionID: uuid.New().String(),
 		UserID:    user.ID,
 		ExpiresAt: time.Now().Add(24 * time.Hour),
 	}

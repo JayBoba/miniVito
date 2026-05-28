@@ -1,9 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
-	ID        string    `db:"id"`
+	ID        uuid.UUID `db:"id"`
 	Login     string    `db:"login"`
 	Password  string    `db:"password"`
 	Email     *string   `db:"email"`
@@ -15,7 +19,7 @@ type User struct {
 
 type Session struct {
 	SessionID string    `db:"session_id"`
-	UserID    string    `db:"user_id"`
+	UserID    uuid.UUID `db:"user_id"`
 	CreatedAt time.Time `db:"created_at"`
 	ExpiresAt time.Time `db:"expires_at"`
 }
