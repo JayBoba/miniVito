@@ -23,8 +23,8 @@ func (r *adRepo) CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error) 
 	var id uuid.UUID
 
 	query := `
-		INSERT INTO ads (user_id, status) 
-		VALUES ($1, $2) 
+		INSERT INTO ads (user_id) 
+		VALUES ($1) 
 		RETURNING id
 	`
 
@@ -40,7 +40,7 @@ func (r *adRepo) GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models
 	var ads []models.Ad
 
 	query := `
-		SELECT id, user_id, status, created_at, completed_at 
+		SELECT id, user_id, status, created_at, completed_at, updated_at
 		FROM ads 
 		WHERE user_id = $1
 	`

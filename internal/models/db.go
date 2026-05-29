@@ -30,4 +30,5 @@ type Ad struct {
 	Status      string     `db:"status"`
 	CreatedAt   time.Time  `db:"created_at"`
 	CompletedAt *time.Time `db:"completed_at"`
+	UpdatedAt   time.Time  `db:"updated_at"`
 }
