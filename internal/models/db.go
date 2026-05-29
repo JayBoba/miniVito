@@ -23,3 +23,11 @@ type Session struct {
 	CreatedAt time.Time `db:"created_at"`
 	ExpiresAt time.Time `db:"expires_at"`
 }
+
+type Ad struct {
+	ID          uuid.UUID  `db:"id"`
+	UserID      uuid.UUID  `db:"user_id"`
+	Status      string     `db:"status"`
+	CreatedAt   time.Time  `db:"created_at"`
+	CompletedAt *time.Time `db:"completed_at"`
+}

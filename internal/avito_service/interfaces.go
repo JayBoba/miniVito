@@ -18,3 +18,13 @@ type UserUseCase interface {
 	Register(ctx context.Context, login, password string) (uuid.UUID, error)
 	Login(ctx context.Context, login, password string) (string, error)
 }
+
+type AdRepository interface {
+	CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error)
+	GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error)
+}
+
+type AdUseCase interface {
+	CreateAd(ctx context.Context, userID uuid.UUID, status string) (uuid.UUID, error)
+	GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error)
+}
