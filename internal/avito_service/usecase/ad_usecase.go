@@ -1,0 +1,43 @@
+package usecase
+
+import (
+	"context"
+	"errors"
+
+	"github.com/google/uuid"
+
+	"mini-avito/internal/avito_service"
+	"mini-avito/internal/models"
+)
+
+type adUseCase struct {
+	repo avito_service.AdRepository
+}
+
+func NewAdUseCase(repo avito_service.AdRepository) avito_service.AdUseCase {
+	return &adUseCase{
+		repo: repo,
+	}
+}
+
+func (u *adUseCase) CreateAd(ctx context.Context, userID uuid.UUID, status string) (uuid.UUID, error) {
+	if status == "" {
+		return uuid.Nil, errors.New("Ad status cannot be empty")
+	}
+
+	// TODO: логика отправки сообщения в RabbitMQ
+	ad := models.Ad{
+		UserID: userID,
+		Status: status,
+	}
+
+	return u.repo.CreateAd(ctx, ad)
+}
+
+func (u *adUseCase) GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error) {
+	if userID == uuid.Nil {
+		return nil, errors.New("Wrong user ID")
+	}
+
+	return u.repo.GetAdsByUserID(ctx, userID)
+}

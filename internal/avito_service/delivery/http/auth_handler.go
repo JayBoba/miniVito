@@ -1,11 +1,9 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"mini-avito/internal/avito_service"
-	"mini-avito/internal/jwt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -113,4 +111,3 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Token: token,
 	})
 }
-
