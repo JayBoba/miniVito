@@ -14,6 +14,7 @@ import (
 	"mini-avito/internal/avito_service/usecase"
 	"mini-avito/internal/config"
 	"mini-avito/internal/jwt"
+	"mini-avito/internal/middleware"
 )
 
 func main() {
@@ -44,6 +45,12 @@ func main() {
 	mux.HandleFunc("/dbtest", testHandler.DBTest)
 	mux.HandleFunc("/register", authHandler.Register)
 	mux.HandleFunc("/login", authHandler.Login)
+	mux.Handle("/protected", middleware.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value(middleware.UserIDKey).(string)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Access granted! Your User ID is: " + userID))
+	})))
 
 	srv := NewServer("8080", mux)
 
