@@ -15,6 +15,7 @@ type Config struct {
 	DBPassword string
 	DBName     string
 	ServerPort int
+	JWTSecret  string
 }
 
 func New() *Config {
@@ -29,6 +30,7 @@ func New() *Config {
 		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBName:     os.Getenv("DB_NAME"),
 		ServerPort: getEnvAsInt("SERVER_PORT"),
+		JWTSecret:  os.Getenv("JWT_SECRET"),
 	}
 }
 

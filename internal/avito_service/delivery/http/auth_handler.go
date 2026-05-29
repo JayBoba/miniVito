@@ -1,9 +1,11 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"mini-avito/internal/avito_service"
+	"mini-avito/internal/jwt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -109,5 +111,39 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(loginResponse{
 		Token: token,
+	})
+}
+
+type contextKey string
+
+const (
+	UserIDKey contextKey = "userID"
+)
+
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+			return
+		}
+
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
+			return
+		}
+
+		tokenString := parts[1]
+
+		claims, err := jwt.ValidateToken(tokenString)
+		if err != nil {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), UserIDKey, claims.UserID)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

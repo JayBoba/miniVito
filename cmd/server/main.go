@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -12,11 +13,16 @@ import (
 	"mini-avito/internal/avito_service/repository"
 	"mini-avito/internal/avito_service/usecase"
 	"mini-avito/internal/config"
+	"mini-avito/internal/jwt"
 )
 
 func main() {
 
 	cfg := config.New()
+	jwt.Init(jwt.Config{
+		SecretKey:     cfg.JWTSecret,
+		TokenDuration: 24 * time.Hour, // токен живет сутки!!!
+	})
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
 
