@@ -15,6 +15,7 @@ import (
 	"mini-avito/internal/config"
 	"mini-avito/internal/jwt"
 	"mini-avito/internal/middleware"
+	"mini-avito/internal/rabbitmq"
 )
 
 func main() {
@@ -40,8 +41,14 @@ func main() {
 	userUC := usecase.NewUserUseCase(userRepo)
 	authHandler := httpdelivery.NewAuthHandler(userUC)
 
+	publisher, err := rabbitmq.NewPublisher("amqp://guest:guest@localhost:5672/")
+	if err != nil {
+		log.Fatalf("[Main] Failed to initialize RabbitMQ publisher: %v", err)
+	}
+	defer publisher.Close()
+
 	adRepo := repository.NewAdRepo(db)
-	adUC := usecase.NewAdUseCase(adRepo)
+	adUC := usecase.NewAdUseCase(adRepo, publisher)
 	adHandler := httpdelivery.NewAdHandler(adUC)
 
 	mux := http.NewServeMux()

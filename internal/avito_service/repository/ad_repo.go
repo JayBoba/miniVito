@@ -28,7 +28,7 @@ func (r *adRepo) CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error) 
 		RETURNING id
 	`
 
-	err := r.db.QueryRowContext(ctx, query, ad.UserID, ad.Status).Scan(&id)
+	err := r.db.QueryRowContext(ctx, query, ad.UserID).Scan(&id)
 	if err != nil {
 		return uuid.Nil, err
 	}
