@@ -1,13 +1,22 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type StatusUpdateMsg struct {
+	AdID   string `json:"ad_id"`
+	Status string `json:"status"`
+}
 
 func main() {
 	amqpURL := "amqp://guest:guest@localhost:5672/"
@@ -51,7 +60,7 @@ func main() {
 	msgs, err := ch.Consume(
 		"ad_created",
 		"",
-		true,
+		false, 
 		false,
 		false,
 		false,
@@ -63,7 +72,45 @@ func main() {
 
 	go func() {
 		for msg := range msgs {
-			log.Printf("[Worker] Received a message: %s", string(msg.Body))
+			adID := string(msg.Body)
+			log.Printf("[Worker] Processing ad ID: %s", adID)
+
+			time.Sleep(5 * time.Second)
+
+			statuses := []string{"approved", "rejected"}
+			newStatus := statuses[rand.Intn(len(statuses))]
+
+			updateMsg := StatusUpdateMsg{
+				AdID:   adID,
+				Status: newStatus,
+			}
+
+			body, err := json.Marshal(updateMsg)
+			if err != nil {
+				log.Printf("[Worker] JSON marshal error: %v", err)
+				msg.Nack(false, false)
+				continue
+			}
+
+			err = ch.PublishWithContext(context.Background(),
+				"",
+				"ad_status_changed",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "application/json",
+					Body:        body,
+				})
+
+			if err != nil {
+				log.Printf("[Worker] Failed to publish status update: %v", err)
+				msg.Nack(false, true)
+				continue
+			}
+
+			log.Printf("[Worker] Successfully processed and published status '%s' for ad %s", newStatus, adID)
+			
+			msg.Ack(false)
 		}
 	}()
 
