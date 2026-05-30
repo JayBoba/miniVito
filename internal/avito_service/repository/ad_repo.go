@@ -52,3 +52,9 @@ func (r *adRepo) GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models
 
 	return ads, nil
 }
+
+func (r *adRepo) UpdateAdStatus(ctx context.Context, id uuid.UUID, status string) error {
+	query := `UPDATE ads SET status = $1 WHERE id = $2`
+	_, err := r.db.ExecContext(ctx, query, status, id)
+	return err
+}

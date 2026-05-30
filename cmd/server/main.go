@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -50,6 +51,14 @@ func main() {
 	adRepo := repository.NewAdRepo(db)
 	adUC := usecase.NewAdUseCase(adRepo, publisher)
 	adHandler := httpdelivery.NewAdHandler(adUC)
+
+	statusConsumer, err := rabbitmq.NewStatusConsumer("amqp://guest:guest@localhost:5672/", adRepo)
+	if err != nil {
+		log.Fatalf("[Main] Failed to initialize status consumer: %v", err)
+	}
+	defer statusConsumer.Close()
+
+	statusConsumer.Start(context.Background())
 
 	mux := http.NewServeMux()
 

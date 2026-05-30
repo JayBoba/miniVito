@@ -22,6 +22,7 @@ type UserUseCase interface {
 type AdRepository interface {
 	CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error)
 	GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error)
+	UpdateAdStatus(ctx context.Context, id uuid.UUID, status string) error
 }
 
 type AdUseCase interface {
