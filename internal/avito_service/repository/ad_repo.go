@@ -23,8 +23,8 @@ func (r *adRepo) CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error) 
 	var id uuid.UUID
 
 	query := `
-		INSERT INTO ads (user_id) 
-		VALUES ($1) 
+		INSERT INTO ads (user_id, status) 
+		VALUES ($1, $2) 
 		RETURNING id
 	`
 

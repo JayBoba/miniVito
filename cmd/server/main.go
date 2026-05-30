@@ -40,6 +40,10 @@ func main() {
 	userUC := usecase.NewUserUseCase(userRepo)
 	authHandler := httpdelivery.NewAuthHandler(userUC)
 
+	adRepo := repository.NewAdRepo(db)
+	adUC := usecase.NewAdUseCase(adRepo)
+	adHandler := httpdelivery.NewAdHandler(adUC)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/dbtest", testHandler.DBTest)
@@ -52,6 +56,8 @@ func main() {
 		w.Write([]byte("Access granted! Your User ID is: " + userID))
 	})))
 
+	mux.Handle("/ads/create", middleware.AuthMiddleware(http.HandlerFunc(adHandler.CreateAd)))
+	mux.Handle("/ads/my", middleware.AuthMiddleware(http.HandlerFunc(adHandler.GetMyAds)))
 	srv := NewServer("8080", mux)
 
 	if err := srv.Run(); err != nil {
