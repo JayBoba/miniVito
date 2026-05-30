@@ -25,6 +25,6 @@ type AdRepository interface {
 }
 
 type AdUseCase interface {
-	CreateAd(ctx context.Context, userID uuid.UUID, status string) (uuid.UUID, error)
+	CreateAd(ctx context.Context, userID uuid.UUID) (uuid.UUID, error)
 	GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error)
 }

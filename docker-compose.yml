@@ -10,16 +10,22 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      # Прокидываем папку с инициализационными скриптами
       - ./deployment/db/init:/docker-entrypoint-initdb.d
-      # Изолированный volume для сохранения данных при перезапуске контейнера
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      # pg_isready проверяет, готова ли база принимать подключения
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_broker
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
 volumes:
   pgdata:

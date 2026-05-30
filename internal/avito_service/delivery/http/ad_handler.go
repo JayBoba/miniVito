@@ -38,19 +38,12 @@ func (h *AdHandler) CreateAd(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
-		log.Printf("[CreateAd] Error parsing UUID (%s): %v\n", userIDStr, err)
-		http.Error(w, "Unauthorized: invalid user id format", http.StatusUnauthorized)
+		log.Printf("[CreateAd] Error parsing UUID: %v\n", err)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	var req createAdRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Printf("[CreateAd] Error decoding JSON body: %v\n", err)
-		http.Error(w, "Bad request: invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	adID, err := h.usecase.CreateAd(r.Context(), userID, req.Status)
+	adID, err := h.usecase.CreateAd(r.Context(), userID)
 	if err != nil {
 		log.Printf("[CreateAd] UseCase error (500): %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

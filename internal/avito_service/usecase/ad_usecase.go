@@ -20,15 +20,14 @@ func NewAdUseCase(repo avito_service.AdRepository) avito_service.AdUseCase {
 	}
 }
 
-func (u *adUseCase) CreateAd(ctx context.Context, userID uuid.UUID, status string) (uuid.UUID, error) {
-	if status == "" {
-		return uuid.Nil, errors.New("Ad status cannot be empty")
+func (u *adUseCase) CreateAd(ctx context.Context, userID uuid.UUID) (uuid.UUID, error) {
+	if userID == uuid.Nil {
+		return uuid.Nil, errors.New("Wrong user ID")
 	}
 
 	// TODO: логика отправки сообщения в RabbitMQ
 	ad := models.Ad{
 		UserID: userID,
-		Status: status,
 	}
 
 	return u.repo.CreateAd(ctx, ad)
