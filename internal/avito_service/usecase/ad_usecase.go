@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/google/uuid"
 
@@ -11,26 +12,41 @@ import (
 )
 
 type adUseCase struct {
-	repo avito_service.AdRepository
+	repo      avito_service.AdRepository
+	publisher AdPublisher
 }
 
-func NewAdUseCase(repo avito_service.AdRepository) avito_service.AdUseCase {
+func NewAdUseCase(repo avito_service.AdRepository, publisher AdPublisher) avito_service.AdUseCase {
 	return &adUseCase{
-		repo: repo,
+		repo:      repo,
+		publisher: publisher,
 	}
+}
+
+type AdPublisher interface {
+	PublishAdCreated(ctx context.Context, adID string) error
 }
 
 func (u *adUseCase) CreateAd(ctx context.Context, userID uuid.UUID) (uuid.UUID, error) {
 	if userID == uuid.Nil {
-		return uuid.Nil, errors.New("Wrong user ID")
+		return uuid.Nil, errors.New("invalid user ID")
 	}
 
-	// TODO: логика отправки сообщения в RabbitMQ
 	ad := models.Ad{
 		UserID: userID,
 	}
 
-	return u.repo.CreateAd(ctx, ad)
+	adID, err := u.repo.CreateAd(ctx, ad)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	err = u.publisher.PublishAdCreated(ctx, adID.String())
+	if err != nil {
+		log.Printf("[UseCase] Error publishing to RabbitMQ: %v\n", err)
+	}
+
+	return adID, nil
 }
 
 func (u *adUseCase) GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error) {
