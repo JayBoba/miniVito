@@ -14,7 +14,18 @@ type Publisher struct {
 }
 
 func NewPublisher(amqpURL string) (*Publisher, error) {
-	conn, err := amqp.Dial(amqpURL)
+	var conn *amqp.Connection
+	var err error
+
+	for i := 0; i < 5; i++ {
+		conn, err = amqp.Dial(amqpURL)
+		if err == nil {
+			break
+		}
+		log.Printf("[RabbitMQ] Connection failed, retrying in 3 seconds... (%d/5)\n", i+1)
+		time.Sleep(3 * time.Second)
+	}
+
 	if err != nil {
 		return nil, err
 	}

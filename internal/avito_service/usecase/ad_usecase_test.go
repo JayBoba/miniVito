@@ -12,6 +12,7 @@ import (
 type mockAdRepo struct {
 	CreateAdFunc       func(ctx context.Context, ad models.Ad) (uuid.UUID, error)
 	GetAdsByUserIDFunc func(ctx context.Context, userID uuid.UUID) ([]models.Ad, error)
+	UpdateAdStatusFunc func(ctx context.Context, id uuid.UUID, status string) error
 }
 
 func (m *mockAdRepo) CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, error) {
@@ -20,6 +21,13 @@ func (m *mockAdRepo) CreateAd(ctx context.Context, ad models.Ad) (uuid.UUID, err
 
 func (m *mockAdRepo) GetAdsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Ad, error) {
 	return m.GetAdsByUserIDFunc(ctx, userID)
+}
+
+func (m *mockAdRepo) UpdateAdStatus(ctx context.Context, id uuid.UUID, status string) error {
+	if m.UpdateAdStatusFunc != nil {
+		return m.UpdateAdStatusFunc(ctx, id, status)
+	}
+	return nil
 }
 
 type mockPublisher struct {
