@@ -9,6 +9,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	httpdelivery "mini-avito/internal/avito_service/delivery/http"
 	"mini-avito/internal/avito_service/repository"
@@ -65,6 +66,7 @@ func main() {
 	mux.HandleFunc("/dbtest", testHandler.DBTest)
 	mux.HandleFunc("/register", authHandler.Register)
 	mux.HandleFunc("/login", authHandler.Login)
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/protected", middleware.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value(middleware.UserIDKey).(string)
 
